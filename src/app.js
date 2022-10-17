@@ -2,16 +2,16 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
 
-import userRouter from "./routes/userRoute.js"
+import userRouter from "./routes/userRoute.js";
 
 const app = express();
-const port = process.env.PORT
+const port = process.env.PORT || 6060;
 
 app.use(express.json());
 
-app.get('/', (_, res) =>{
-	res.send("Hello World!!!");
-})
+app.get("/", (_, res) => {
+	res.json({message: "TODO API is Running!!!"})
+});
 
 app.use("/api/v1/users", userRouter);
 
