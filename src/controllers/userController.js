@@ -3,7 +3,7 @@ import db from "../database/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validate from "../middleware/validate.middleware.js";
-import { checkEmail, loginUser, newUser } from "../../utils/queries.js";
+import { checkEmail, loginUser, newUser } from "../utils/queries.js";
 
 
 // Add a new User
