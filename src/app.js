@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import userRouter from "./routes/userRoute.js";
+import errorHandler from "./utils/errorHandler.js";
 
 const app = express();
 const port = process.env.PORT || 6060;
@@ -14,6 +15,8 @@ app.get("/", (_, res) => {
 });
 
 app.use("/api/v1/users", userRouter);
+
+app.use(errorHandler);
 
 app.listen(port, () => {
 	console.log(`App listening on port: http://localhost:${port}`);
