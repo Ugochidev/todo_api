@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import userRouter from "./routes/userRoute.js";
+import todoRouter from "./routes/todoRoute.js"
 import errorHandler from "./utils/errorHandler.js";
 
 const app = express();
@@ -15,6 +16,7 @@ app.get("/", (_, res) => {
 });
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/todos", todoRouter);
 
 app.use(errorHandler);
 

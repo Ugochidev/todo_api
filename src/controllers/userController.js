@@ -3,7 +3,7 @@ import db from "../database/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validate from "../middleware/validate.middleware.js";
-import { checkEmail, loginUser, newUser } from "../utils/queries.js";
+import { checkEmail, loginUser, newUser } from "../utils/userQueries.js";
 
 // Add a new User
 const createUser = async (req, res, next) => {
@@ -79,6 +79,7 @@ const login = async (req, res, next) => {
 		if (email && password) {
 			db.query(loginUser, [email], (err, rows) => {
 				if (err) {
+					console.log(err)
 					return res.status(500).json({
 						message:
 							"An error occurred, please contact the system Admin",
