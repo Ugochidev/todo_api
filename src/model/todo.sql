@@ -2,12 +2,14 @@
 CREATE DATABASE todo_api;
 
 -- USER TABLE --
+CREATE TYPE stats AS ENUM ('Pending', 'Completed');
 CREATE TABLE todos
 (
 	id VARCHAR(36) UNIQUE PRIMARY KEY,
 	user_id VARCHAR(36),
-	task VARCHAR(50) NOT NULL,
-	status ENUM('Pending', 'Completed') DEFAULT 'Pending',
+	title VARCHAR(50) NOT NULL,
+	description VARCHAR(100) NOT NULL,
+	status stats DEFAULT 'Pending',
 	due_date TIMESTAMP NOT NULL,
 	created_at TIMESTAMP,
 	updated_at TIMESTAMP,

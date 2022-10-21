@@ -4,7 +4,7 @@ const errorHandler = (err, req, res, next) => {
 		message: "An error occurred, please contact the system Admin",
 	};
 
-	return res.status(responseBody.statusCode).json(responseBody.message);
+	return res.status(responseBody.statusCode).json(responseBody);
 };
 
 export default errorHandler;

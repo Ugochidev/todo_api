@@ -1,9 +1,8 @@
 import { v4 } from "uuid";
-import db from "../database/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validate from "../middleware/validate.middleware.js";
-import { checkEmail, loginUser, newUser } from "../utils/userQueries.js";
+import { checkEmail, newUser } from "../utils/userQueries.js";
 import pool from "../database/db.js";
 
 // Add a new User
@@ -17,60 +16,38 @@ const createUser = async (req, res, next) => {
 		await validate.validateSignUP.validateAsync(req.body);
 
 		// checking if a user already has an account
-		pool.query(checkEmail, [req.body.email], (err, rows) => {
-			if (err) {
-				console.log(err);
-				return res.status(500).json({
-					message:
-						"An error occurred, please contact the system Admin",
-				});
-			}
+		const verifyEmail = await pool.query(checkEmail, [email]);
+		if (verifyEmail.rows[0]) {
+			return res.status(400).json({
+				message: "User already exist",
+			});
+		}
+		// creating a new user
+		const users = {
+			id: v4(),
+			first_name: first_name,
+			last_name: last_name,
+			email: email,
+			phone_number: phone_number,
+			password: hashPassword,
+		};
 
-			if (rows.length) {
-				return res.status(400).json({
-					message: "User already exist",
-				});
-			}
-
-			// creating a new user
-			const users = {
-				id: v4(),
-				first_name: first_name,
-				last_name: last_name,
-				email: email,
-				phone_number: phone_number,
-				password: hashPassword,
-			};
-			pool.query(
-				newUser,
-				[
-					users.id,
-					users.first_name,
-					users.last_name,
-					users.email,
-					users.phone_number,
-					users.password,
-				],
-				(err, _) => {
-					if (err) {
-						console.log(err);
-						return res.status(500).json({
-							message:
-								"An error occurred, please contact the system Admin",
-						});
-					}
-
-					return res.status(201).json({ message: "User created" });
-				}
-			);
-		});
+		const createUser = await pool.query(newUser, [
+			users.id,
+			users.first_name,
+			users.last_name,
+			users.email,
+			users.phone_number,
+			users.password,
+		]);
+		return res.status(201).json({ message: "User created" });
 	} catch (err) {
 		next(err);
 	}
 };
 
 // logging in a user
-const login = async (req, res, next) => {
+const loginUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 
@@ -79,39 +56,33 @@ const login = async (req, res, next) => {
 
 		//  checking email and password match
 		if (email && password) {
-			db.query(loginUser, [email], (err, rows) => {
-				if (err) {
-					console.log(err)
-					return res.status(500).json({
-						message:
-							"An error occurred, please contact the system Admin",
-					});
-				}
-				if (!rows.length) {
-					return res.status(400).json({
-						message: "email address not found.",
-					});
-				}
-				const passMatch = bcrypt.compare(password, rows[0].password);
-				if (!passMatch) {
-					return res
-						.status(400)
-						.json({ message: "incorrect details" });
-				}
+			const verifyEmail = await pool.query(checkEmail, [email]);
 
-				// creating a payload
-				const payload = {
-					id: rows[0].id,
-					email: rows[0].email,
-				};
+			if (!verifyEmail.rows.length) {
+				return res.status(400).json({
+					message: "email address not found.",
+				});
+			}
+			const passMatch = bcrypt.compare(
+				password,
+				verifyEmail.rows[0].password
+			);
+			if (!passMatch) {
+				return res.status(400).json({ message: "incorrect details" });
+			}
 
-				const token = jwt.sign(payload, process.env.SECRET, {
-					expiresIn: "1h",
-				});
-				return res.status(200).json({
-					message: "User logged in successfully",
-					token: token,
-				});
+			// creating a payload
+			const payload = {
+				id: verifyEmail.rows[0].id,
+				email: verifyEmail.rows[0].email,
+			};
+
+			const token = jwt.sign(payload, process.env.SECRET, {
+				expiresIn: "1h",
+			});
+			return res.status(200).json({
+				message: "User logged in successfully",
+				token: token,
 			});
 		}
 	} catch (err) {
@@ -121,5 +92,5 @@ const login = async (req, res, next) => {
 
 export default {
 	createUser,
-	login,
+	loginUser,
 };
