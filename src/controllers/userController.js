@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validate from "../middleware/validate.middleware.js";
 import { checkEmail, loginUser, newUser } from "../utils/userQueries.js";
+import pool from "../database/db.js";
 
 // Add a new User
 const createUser = async (req, res, next) => {
@@ -16,8 +17,9 @@ const createUser = async (req, res, next) => {
 		await validate.validateSignUP.validateAsync(req.body);
 
 		// checking if a user already has an account
-		db.query(checkEmail, [req.body.email], (err, rows) => {
+		pool.query(checkEmail, [req.body.email], (err, rows) => {
 			if (err) {
+				console.log(err);
 				return res.status(500).json({
 					message:
 						"An error occurred, please contact the system Admin",
@@ -39,7 +41,7 @@ const createUser = async (req, res, next) => {
 				phone_number: phone_number,
 				password: hashPassword,
 			};
-			db.query(
+			pool.query(
 				newUser,
 				[
 					users.id,

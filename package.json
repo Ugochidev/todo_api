@@ -19,6 +19,7 @@
 		"jsonwebtoken": "^8.5.1",
 		"mysql": "^2.18.1",
 		"mysql2": "^2.3.3",
+		"pg": "^8.8.0",
 		"uuid": "^9.0.0"
 	},
 	"devDependencies": {

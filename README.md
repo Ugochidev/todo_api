@@ -18,7 +18,8 @@ node app.js
 
 
 ### Testing of the Application
-
+Hosting of api done on [HEROKU](https://users-todoapp.herokuapp.com/)
+Documentation done on [POSTMAN]()
 
 ### Authors :black_nib:
 [Abiodun Shittu](https://github.com/Abiodun-Shittu/)
