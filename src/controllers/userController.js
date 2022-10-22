@@ -42,7 +42,6 @@ const createUser = async (req, res, next) => {
 		]);
 		return res.status(201).json({ message: "User created" });
 	} catch (err) {
-		console.log(err);
 		next(err);
 	}
 };
@@ -53,8 +52,8 @@ const loginUser = async (req, res, next) => {
 		const { email, password } = req.body;
 
 		// validate with joi
-		await validateSignIn.validateAsync(req.body);
-
+		const validate = await validateSignIn.validateAsync(req.body);
+		console.log(validate);
 		//  checking email and password match
 		if (email && password) {
 			const verifyEmail = await pool.query(checkEmail, [email]);
@@ -87,6 +86,7 @@ const loginUser = async (req, res, next) => {
 			});
 		}
 	} catch (err) {
+		console.log(err);
 		next(err);
 	}
 };
