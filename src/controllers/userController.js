@@ -52,13 +52,12 @@ const loginUser = async (req, res, next) => {
 		const validate = await validateSignIn.validateAsync(req.body);
 
 		//  checking email and password match
-		if (email && password) {
 			const verifyEmail = await pool.query(findEmailQuery, [email]);
 
 			if (!verifyEmail.rows.length) {
 				throw new AppException(404, "Incorrect Details");
 			}
-			const passMatch = bcrypt.compare(
+			const passMatch = await bcrypt.compare(
 				password,
 				verifyEmail.rows[0].password
 			);
@@ -79,7 +78,6 @@ const loginUser = async (req, res, next) => {
 				message: "User logged in successfully",
 				token: token,
 			});
-		}
 	} catch (err) {
 		next(err);
 	}
