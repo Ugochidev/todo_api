@@ -7,7 +7,7 @@ const validateSignUP = Joi.object({
   email: Joi.string().email({
     minDomainSegments: 2,
     tlds: { allow: ["com", "net"] },
-  }).required,
+  }).required(),
   password: Joi.string().min(8).required(),
 });
 
@@ -16,4 +16,4 @@ const validateSignIn = Joi.object({
   password: Joi.string().min(8).required(),
 });
 
-export default { validateSignUP, validateSignIn };
+export { validateSignUP, validateSignIn };

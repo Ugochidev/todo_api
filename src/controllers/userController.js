@@ -1,7 +1,7 @@
 import { v4 } from "uuid";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import validate from "../middleware/validate.middleware.js";
+import { validateSignIn, validateSignUP } from "../middleware/validate.middleware.js";
 import { checkEmail, newUser } from "../utils/userQueries.js";
 import pool from "../database/db.js";
 
@@ -13,8 +13,8 @@ const createUser = async (req, res, next) => {
 		const hashPassword = await bcrypt.hash(password, 10);
 
 		// validating reg.body with joi
-		await validate.validateSignUP.validateAsync(req.body);
-
+		const validate = await validateSignUP.validateAsync(req.body);
+		console.log(validate);
 		// checking if a user already has an account
 		const verifyEmail = await pool.query(checkEmail, [email]);
 		if (verifyEmail.rows[0]) {
@@ -42,6 +42,7 @@ const createUser = async (req, res, next) => {
 		]);
 		return res.status(201).json({ message: "User created" });
 	} catch (err) {
+		console.log(err);
 		next(err);
 	}
 };
@@ -52,7 +53,7 @@ const loginUser = async (req, res, next) => {
 		const { email, password } = req.body;
 
 		// validate with joi
-		await validate.validateSignIn.validateAsync(req.body);
+		await validateSignIn.validateAsync(req.body);
 
 		//  checking email and password match
 		if (email && password) {
