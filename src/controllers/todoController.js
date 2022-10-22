@@ -63,7 +63,7 @@ const getTodo = async (req, res, next) => {
 		if (findTodo.rows[0].user_id !== req.userId) {
 			throw new AppException(403, "Unauthorized")
 		}
-		return res.status(200).json(findTodo);
+		return res.status(200).json(findTodo.rows[0]);
 	} catch (err) {
 		next(err);
 	}
