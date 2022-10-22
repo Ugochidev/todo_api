@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import pool from "../database/db.js";
+import AppException from "../utils/appException.js";
 import {
 	createTodoQuery,
 	deleteTodoQuery,
@@ -56,13 +57,11 @@ const getTodo = async (req, res, next) => {
 		const { id } = req.params;
 
 		const findTodo = await pool.query(findTodoQuery, [id]);
-		if (!findTodo.rows.length) {
-			return res.status(404).json({
-				message: "Todo not found",
-			});
+		if (!findTodo.rowCount) {
+			throw new AppException(404, "Todo Not Found")
 		}
 		if (findTodo.rows[0].user_id !== req.userId) {
-			return res.status(403).json({ message: "Unauthorized" });
+			throw new AppException(403, "Unauthorized")
 		}
 		return res.status(200).json(findTodo);
 	} catch (err) {
@@ -77,12 +76,10 @@ const updateTodo = async (req, res, next) => {
 		const updated_at = new Date();
 		const findTodo = await pool.query(findTodoQuery, [id]);
 		if (!findTodo.rows.length) {
-			return res.status(404).json({
-				message: "Todo not found",
-			});
+			throw new AppException(404, "Todo Not Found")
 		}
 		if (findTodo.rows[0].user_id !== req.userId) {
-			return res.status(403).json({ message: "Unauthorized" });
+			throw new AppException(403, "Unauthorized")
 		}
 
 		let updateTodos = "UPDATE todos SET updated_at = $1, ";
@@ -117,16 +114,14 @@ const deleteTodo = async (req, res, next) => {
 		const { id } = req.params;
 		const findTodo = await pool.query(findTodoQuery, [id]);
 		if (!findTodo.rows.length) {
-			return res.status(404).json({
-				message: "Todo not found",
-			});
+			throw new AppException(404, "Todo Not Found")
 		}
 		if (findTodo.rows[0].user_id !== req.userId) {
-			return res.status(403).json({ message: "Unauthorized" });
+			throw new AppException(403, "Unauthorized")
 		}
 		pool.query(deleteTodoQuery, [id]);
 
-		return res.status(200).json({
+		return res.status(410).json({
 			message: "Todo Successfully Deleted",
 		});
 	} catch (err) {

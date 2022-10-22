@@ -1,43 +1,40 @@
 import { v4 } from "uuid";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { validateSignIn, validateSignUP } from "../middleware/validate.middleware.js";
-import { checkEmail, newUser } from "../utils/userQueries.js";
+import {
+	validateSignIn,
+	validateSignUP,
+} from "../middleware/validate.middleware.js";
+import { findEmailQuery, newUserQuery } from "../utils/userQueries.js";
 import pool from "../database/db.js";
+import AppException from "../utils/appException.js";
 
 // Add a new User
 const createUser = async (req, res, next) => {
 	try {
-		const { first_name, last_name, email, phone_number, password } =
-			req.body;
+		const { name, email, password } = req.body;
 		const hashPassword = await bcrypt.hash(password, 10);
 
 		// validating reg.body with joi
 		const validate = await validateSignUP.validateAsync(req.body);
-		console.log(validate);
+
 		// checking if a user already has an account
-		const verifyEmail = await pool.query(checkEmail, [email]);
+		const verifyEmail = await pool.query(findEmailQuery, [email]);
 		if (verifyEmail.rows[0]) {
-			return res.status(400).json({
-				message: "User already exist",
-			});
+			throw new AppException(404, "User Already Exists");
 		}
 		// creating a new user
 		const users = {
 			id: v4(),
-			first_name: first_name,
-			last_name: last_name,
+			name: name,
 			email: email,
-			phone_number: phone_number,
 			password: hashPassword,
 		};
 
-		const createUser = await pool.query(newUser, [
+		const createUser = await pool.query(newUserQuery, [
 			users.id,
-			users.first_name,
-			users.last_name,
+			users.name,
 			users.email,
-			users.phone_number,
 			users.password,
 		]);
 		return res.status(201).json({ message: "User created" });
@@ -53,22 +50,20 @@ const loginUser = async (req, res, next) => {
 
 		// validate with joi
 		const validate = await validateSignIn.validateAsync(req.body);
-		console.log(validate);
+
 		//  checking email and password match
 		if (email && password) {
-			const verifyEmail = await pool.query(checkEmail, [email]);
+			const verifyEmail = await pool.query(findEmailQuery, [email]);
 
 			if (!verifyEmail.rows.length) {
-				return res.status(400).json({
-					message: "email address not found.",
-				});
+				throw new AppException(404, "Incorrect Details");
 			}
 			const passMatch = bcrypt.compare(
 				password,
 				verifyEmail.rows[0].password
 			);
 			if (!passMatch) {
-				return res.status(400).json({ message: "incorrect details" });
+				throw new AppException(404, "Incorrect Details");
 			}
 
 			// creating a payload
@@ -86,7 +81,6 @@ const loginUser = async (req, res, next) => {
 			});
 		}
 	} catch (err) {
-		console.log(err);
 		next(err);
 	}
 };
