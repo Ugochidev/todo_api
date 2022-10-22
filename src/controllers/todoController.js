@@ -5,6 +5,7 @@ import {
 	createTodoQuery,
 	deleteTodoQuery,
 	findTodoQuery,
+	userTodosQuery,
 } from "../utils/todoQueries.js";
 
 /*---- Create A New Todo -----*/
@@ -43,7 +44,7 @@ const createTodo = async (req, res, next) => {
 /*---- Fetch All Todos Created By The User -----*/
 const getTodos = async (req, res, next) => {
 	try {
-		const findTodos = await pool.query(findTodoQuery, [req.userId]);
+		const findTodos = await pool.query(userTodosQuery, [req.userId]);
 
 		return res.status(200).json(findTodos.rows);
 	} catch (err) {
