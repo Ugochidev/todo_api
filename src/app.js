@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors"
 dotenv.config();
 
 import userRouter from "./routes/userRoute.js";
@@ -9,6 +10,7 @@ import errorHandler from "./utils/errorHandler.js";
 const app = express();
 const port = process.env.PORT || 6060;
 
+app.use(cors())
 app.use(express.json());
 
 app.get("/", (_, res) => {
