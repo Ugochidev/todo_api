@@ -10,7 +10,7 @@ npm i
 ```
 2. Start the Server
 ```
-node app.js
+npm start
 ```
 
 
@@ -18,8 +18,9 @@ node app.js
 
 
 ### Testing of the Application
-Hosting of api done on [HEROKU](https://users-todoapp.herokuapp.com/)
-Documentation done on [POSTMAN]()
+Hosting of api was done on [HEROKU](https://users-todoapp.herokuapp.com/)
+
+Documentation was done on [POSTMAN](https://documenter.getpostman.com/view/21176038/2s84DpwNhE)
 
 ### Authors :black_nib:
 [Abiodun Shittu](https://github.com/Abiodun-Shittu/)
